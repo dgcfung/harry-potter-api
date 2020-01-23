@@ -1,26 +1,54 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { getAllCharacters, getCharacterById, getCharacterByName } from './services/api-helper';
+import Main from './components/Main';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      characters: [],
+      searchedName: null,
+      searchInput: ''
+      // isLoading: true
+    }
+  }
+
+  handleChange = (e) => {
+    let value = e.target.value;
+    this.setState({
+      searchInput: value
+    })
+    console.log(value)
+
+  }
+
+  handleClick = async (e) => {
+    e.preventDefault();
+    let character = await getCharacterByName(this.state.searchInput);
+    this.setState({
+      searchedName: character.data
+    })
+    console.log(character.data)
+  }
+
+
+  async componentDidMount() {
+    let response = await getAllCharacters();
+    this.setState({
+      characters: response.data
+    })
+    // console.log(response.data)
+
+  }
+  render() {
+    return (
+      <div className="App">
+        <Main searchDeets={this.state.searchedName} searchInput={this.state.searchInput} handleClick={this.handleClick} handleChange={this.handleChange} />
+
+      </div>
+    );
+  }
 }
 
 export default App;
